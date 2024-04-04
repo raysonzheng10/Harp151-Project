@@ -16,8 +16,8 @@ class YouTubeAPI:
         url = f'{self.baseURL}/commentThreads?part=snippet&videoId={video_id}&key={self.APIKEY}&order=relevance&maxResults={number_limit}'
         
         # make the request and store the data
-        response = requests.get(url)
-        data = json.loads(response.text)
+        res = requests.get(url)
+        data = res.json()
 
         # parse through the json and grab the actual comment itself
         items = data["items"]
