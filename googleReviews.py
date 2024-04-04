@@ -11,7 +11,14 @@ class GoogleReviews:
         self.driver = webdriver.Chrome()
 
         self.driver.get('https://www.google.com/')
+    
+    # TODO: make the function compile the reviews into a list of strings. Right now we only get one review, make the function have the ability to get all of them
+    # The end of this function should return a list.
 
+    # TODO: make this function take in 2 additional parameters: number_limit:int, number_stars:int
+    # the number_limit should limit the number of reviews we get (default should be 100?)
+    # the number_stars indicates the type of review we want (ie 1 star/2 star/etc.), default value will be none, so we grab all reviews unordered
+    # feel free to factor some functions out, just do what you think is best
     def get_google_reviews(self, movie: str) -> list[str]:
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
