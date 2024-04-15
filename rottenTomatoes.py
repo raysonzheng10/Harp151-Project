@@ -27,4 +27,6 @@ class RottenTomatoes:
         return reviews
 
 tomatoes = RottenTomatoes()
-tomatoes.get_topCritic_reviews('spiderman')
+reviews = tomatoes.get_topCritic_reviews('the dark knight')
+for review in reviews:
+    print(review)

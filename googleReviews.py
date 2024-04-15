@@ -13,19 +13,15 @@ class GoogleReviews:
         self.driver = webdriver.Chrome()
         self.review_list = []
         self.driver.get('https://www.google.com/')
+
+    # TODO: Combine both functions into the same one
+    # TODO: give default values to review_amount parameter and stars parameter
+    # (you can look at YoutubeAPI.py for an example as well)
+    # (we want to make it so that if we don't input any stars value, it will just default to grabing unordered reviews)
+    # (Right now, we don't have any way of grabbing unordered reviews)
+    # TODO: You can press the END key to scroll down. You need to click on the window first to select it, but you can grab a lot more reviews this way
+    # TODO: Make a helper function to factor out the way we select stars reviews
     
-    # TODO: make the function compile the reviews into a list of strings. Right now we only get one review, make the function have the ability to get all of them
-    # The end of this function should return a list.
-    # TODO: make this function take in 2 additional parameters: number_limit:int, number_stars:int
-    # the number_limit should limit the number of reviews we get (default should be 100?)
-    # the number_stars indicates the type of review we want (ie 1 star/2 star/etc.), default value will be none, so we grab all reviews unordered
-    # feel free to factor some functions out, just do what you think is best
-
-    # ? I had issues trying to scroll down the reviews window
-    # ? It might be possible that not all the reviews will get loaded if you don't scroll the page
-    # ? Might end up not grabbing enough reviews if not enough reviews are loaded/available?
-
-
     def get_google_reviews(self, movie: str, review_amount: int) -> list[str]:
         self.driver.maximize_window()
         WebDriverWait(self.driver, 5).until(
@@ -160,4 +156,4 @@ class GoogleReviews:
 
 
 googleReviews = GoogleReviews()
-googleReviews.get_google_reviews('the shining', 10, 1)
+print(googleReviews.get_google_reviews('the shining', 10, 1))
