@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 class GoogleReviewsScraper:
@@ -24,67 +25,11 @@ class GoogleReviewsScraper:
     # TODO: You can press the END key to scroll down. You need to click on the window first to select it, but you can grab a lot more reviews this way
     # TODO: Make a helper function to factor out the way we select stars reviews
     
-    def get_google_reviews(self, movie: str, review_amount: int) -> list[str]:
+    def get_google_reviews(self, movie: str, review_amount = 20, stars = 0) -> list[str]:
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
         )
-        
-        # the input_element represents the search bar, we clear it and send in the text 'tech with tim' and then press ENTER
-        input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
-        input_element.clear()
-        input_element.send_keys(f"{movie} reviews" + Keys.ENTER)
-        
-        #Finds the review box and clicks into it 
-        try:
-            WebDriverWait(self.driver,5).until(
-                EC.presence_of_element_located((By.CLASS_NAME,"e8eHnd"))
-            )
-            self.driver.find_element(By.CLASS_NAME,"e8eHnd").click()
-        except:
-            print("movie reviews not found")
-
-        #Finds the more button and clicks it
-        #For long movie reviews google won't initially show the whole review
-        #Probably will want to make it so this clicks all the more buttons to load them
-        #So they can be grabbed later?
-        try:
-            WebDriverWait(self.driver,5).until(
-                EC.presence_of_element_located((By.CLASS_NAME,"tEJZ0b"))
-            )
-            for review in self.driver.find_elements(By.CLASS_NAME, "tEJZ0b"):
-                review.click()
-        except:
-            print("")
-        
-        #Finds the movie reviews
-        #All review reviews are class name "T7nuU"
-        WebDriverWait(self.driver,10).until(
-            EC.presence_of_element_located((By.CLASS_NAME,"T7nuU"))
-        )
-        """
-        Array of movie reviews
-        Every even interval is the shortened version of the review
-        The odd intervals are the full versions of the review
-        However if the more button for that review isn't pressed, the review won't be loaded
-        If the more button is pressed, the short review gets unloaded? and the even intervals will end up empty
-        I'm not sure how to deal with the edge cases where a short review shows up
-        It won't have the more option and it will throw off the indexing
-        Can be put into a for loop to grab x amount of reviews
-        """
-        for i in range(review_amount):
-            j = 2 * i
-            review = self.driver.find_elements(By.CLASS_NAME, "T7nuU")[j+1].text
-            self.review_list.append(review)
-            #print(f"This is review {i}\n " + review)
-        #print(self.driver.find_elements(By.CLASS_NAME,"T7nuU")[1].text)
-        return self.review_list
-        time.sleep(5)
-
-    def get_google_reviews_stars(self, movie: str, review_amount: int, stars:int) -> list[str]:
-        WebDriverWait(self.driver, 5).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
-        )
-        
+        self.driver.maximize_window()
         # the input_element represents the search bar, we clear it and send in the text 'tech with tim' and then press ENTER
         input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
         input_element.clear()
@@ -96,62 +41,50 @@ class GoogleReviewsScraper:
                 EC.element_to_be_clickable((By.CLASS_NAME,"e8eHnd"))
             )
             self.driver.find_element(By.CLASS_NAME,"e8eHnd").click()
+            time.sleep(5)
+            if stars != 0:
+                WebDriverWait(self.driver,5).until(
+                    EC.element_to_be_clickable((By.CLASS_NAME, "zbTRdb"))
+                )
+                filter_box = self.driver.find_element(By.CLASS_NAME,"zbTRdb")
+                filter_box.click()
+                WebDriverWait(self.driver,5).until(
+                    EC.element_to_be_clickable((By.XPATH,'//*[@id="lb"]/div[2]/g-menu/g-menu-item[2]'))
+                )
+                if stars == 5:
+                    self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[2]').click()
+                elif stars == 4:
+                    self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[3]').click()
+                elif stars == 3:
+                    self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[4]').click()
+                elif stars == 2:
+                    self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[5]').click()
+                elif stars == 1:
+                    self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[6]').click()
+            try:
+                WebDriverWait(self.driver,5).until(
+                    EC.presence_of_element_located((By.CLASS_NAME,"tEJZ0b"))
+                )
+                for i in range(3):
+                    for review in self.driver.find_elements(By.CLASS_NAME,"tEJZ0b"):
+                        review.click()
+            except:
+                print("")
+            time.sleep(5)
+            for i in range(review_amount):
+                j = 2 * i
+                reviews = self.driver.find_elements(By.CLASS_NAME, "T7nuU")
+            #print(reviews[i][0:10])
+                if reviews[j+1].text == "":
+                    self.review_list.append(reviews[j+2].text)
+                else:
+                    self.review_list.append(reviews[j+1].text)
+            return self.review_list
         except:
             print("movie reviews not found")
-        
-        
-        WebDriverWait(self.driver,5).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "zbTRdb"))
-        )
-        filter_box = self.driver.find_element(By.CLASS_NAME,"zbTRdb")
-        filter_box.click()
-        #Wait for dropdown menu
-        WebDriverWait(self.driver,5).until(
-            EC.element_to_be_clickable((By.XPATH,'//*[@id="lb"]/div[2]/g-menu/g-menu-item[2]'))
-        )
-        #Select an option from dropdown
-        if stars == 5:
-            self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[2]').click()
-        elif stars == 4:
-            self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[3]').click()
-        elif stars == 3:
-            self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[4]').click()
-        elif stars == 2:
-            self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[5]').click()
-        elif stars == 1:
-            self.driver.find_element(By.XPATH, '//*[@id="lb"]/div[2]/g-menu/g-menu-item[6]').click()
-        
-        #Finds the more button and clicks it
-        #For long movie reviews google won't initially show the whole review
-        #Probably will want to make it so this clicks all the more buttons to load them
-        #So they can be grabbed later?
-        try:
-            WebDriverWait(self.driver,5).until(
-                EC.presence_of_element_located((By.CLASS_NAME,"tEJZ0b"))
-            )
-            for i in range (3):
-                for review in self.driver.find_elements(By.CLASS_NAME, "tEJZ0b"):
-                    review.click()
-        except:
-            print("")
-        
-        #Finds the movie reviews
-        #All review reviews are class name "T7nuU"
-        # WebDriverWait(self.driver,10).until(
-        #     EC.presence_of_element_located((By.CLASS_NAME,"T7nuU"))
-        # )
-
+            return self.review_list
         
 
-        time.sleep(5)
-        for i in range(review_amount):
-            j = 2 * i
-            review = self.driver.find_elements(By.CLASS_NAME, "T7nuU")[j+1].text
-            self.review_list.append(review)
-            #print(f"This is review {i}\n " + review)
-        #print(self.driver.find_elements(By.CLASS_NAME,"T7nuU")[1].text)
-        return self.review_list
-        time.sleep(5)
 
     # function to extract youtube video id from the url
     def extract_video_id(self, url: str) -> str:
@@ -194,6 +127,11 @@ class GoogleReviewsScraper:
         return video_id
 
 
+<<<<<<< Updated upstream
 createdGoogleReviews = GoogleReviewsScraper()
+=======
+googleReviews = GoogleReviewsScraper()
+googleReviews.get_google_reviews("the shining", 30)
+>>>>>>> Stashed changes
 # print(googleReviews.get_google_reviews('the shining', 10, 1))
 # googleReviews.get_YoutubeTrailer_Id('the dark knight')
