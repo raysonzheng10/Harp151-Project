@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-class RottenTomatoes:
+class RottenTomatoesScraper:
     def __init__(self):
         self.baseURL = 'https://www.rottentomatoes.com'
 
@@ -26,7 +26,4 @@ class RottenTomatoes:
 
         return reviews
 
-tomatoes = RottenTomatoes()
-reviews = tomatoes.get_topCritic_reviews('the dark knight')
-for review in reviews:
-    print(review)
+CreatedRottenTomatoesScraper = RottenTomatoesScraper()
