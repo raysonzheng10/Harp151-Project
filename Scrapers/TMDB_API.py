@@ -1,6 +1,8 @@
 # Not being used right now, opting for rottentomatoes instead
 import requests
 import json
+import urllib.request 
+from PIL import Image 
 
 # Make a class to handle all TMDB API interactions
 class TMDB_API:
@@ -8,6 +10,7 @@ class TMDB_API:
     def __init__(self, APIKEY):
         self.APIKEY = APIKEY
         self.baseURL = 'https://api.themoviedb.org/3'
+        self.baseImageURL = 'https://image.tmdb.org/t/p/original'
 
     # define a method to get the movie id based off a movie title
     def get_movie_id(self, movie_title:str ) -> str:
@@ -83,9 +86,19 @@ class TMDB_API:
         info['title'] = data['original_title']
         info['overview'] = data['overview']
         info['genres'] = genres
-        
-        # print(json.dumps(data, indent=3))
+        info['image_path'] = data['poster_path']
+        #print(json.dumps(data, indent=3))
         print(info)
+        return info
+
+    def show_image(self, image_path):
+        url = f'{self.baseImageURL}/{image_path}'
+        urllib.request.urlretrieve( 
+        f'{url}', 
+        "poster.png") 
+        
+        img = Image.open("poster.png") 
+        img.show()
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
 
@@ -93,6 +106,7 @@ tmdb_API = TMDB_API(TMDB_APIKEY)
 
 # reviews = tmdb_API.get_reviews_from_title('the dark knight', 5)
 # print(reviews)
-id = tmdb_API.get_movie_id('interstellar')
+id = tmdb_API.get_movie_id('joker')
 #print(tmdb_API.get_YoutubeTrailer_id(id))
-tmdb_API.get_movie_info(id)
+info = tmdb_API.get_movie_info(id)
+tmdb_API.show_image(info['image_path'])
