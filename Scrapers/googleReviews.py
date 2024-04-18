@@ -7,7 +7,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
-class GoogleReviews:
+class GoogleReviewsScraper:
     def __init__(self):
         self.driver = webdriver.Chrome()
         self.review_list = []
@@ -154,5 +154,5 @@ class GoogleReviews:
 
 
 
-googleReviews = GoogleReviews()
+googleReviews = GoogleReviewsScraper()
 print(googleReviews.get_google_reviews('the shining', 10, 1))
