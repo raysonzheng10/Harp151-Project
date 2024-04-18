@@ -1,6 +1,5 @@
-from Scrapers.rottenTomatoes import RottenTomatoes
+# from Scrapers.rottenTomatoes import RottenTomatoesScraper
+# from Scrapers.googleReviews import GoogleReviewsScraper
+from Scrapers.youtubeAPI import CreatedYoutubeAPI
 
-tomatoes = RottenTomatoes()
-reviews = tomatoes.get_topCritic_reviews('spiderman')
-for review in reviews:
-    print(review)
+print(CreatedYoutubeAPI.get_top_comments(video_id='LDG9bisJEaI'))

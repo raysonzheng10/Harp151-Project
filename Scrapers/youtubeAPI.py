@@ -27,14 +27,11 @@ class YouTubeAPI:
             top_comments.append(comment)
 
         return top_comments
-
+    
 
 # Youtube APIKey was created from the YT app
 YOUTUBE_APIKEY = 'AIzaSyBEzevk5Am8U4xhlgdTmMmuFRB7FtbIDQw'
 video_id = 'pBk4NYhWNMM' 
 
 # create an instance of the YouTubeAPI Class
-YoutubeAPI = YouTubeAPI(YOUTUBE_APIKEY)
-
-print(YoutubeAPI.get_top_comments(video_id, number_limit=50))
-
+CreatedYoutubeAPI = YouTubeAPI(YOUTUBE_APIKEY)

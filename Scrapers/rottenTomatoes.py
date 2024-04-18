@@ -26,7 +26,4 @@ class RottenTomatoesScraper:
 
         return reviews
 
-tomatoes = RottenTomatoesScraper()
-reviews = tomatoes.get_topCritic_reviews('the dark knight')
-for review in reviews:
-    print(review)
+CreatedRottenTomatoesScraper = RottenTomatoesScraper()

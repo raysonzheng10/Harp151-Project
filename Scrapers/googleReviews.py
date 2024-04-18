@@ -161,6 +161,7 @@ class GoogleReviewsScraper:
         if '&' in video_id:
             video_id = video_id.split('&')[0]
 
+        # return the string value
         return video_id
     
     def get_YoutubeTrailer_Id(self, movie: str) -> str:
@@ -186,8 +187,8 @@ class GoogleReviewsScraper:
         # After getting to the yt trailer, get the url
         current_url = self.driver.current_url
 
+        # use the extact video id function to get the video id from the url, return that value
         video_id = self.extract_video_id(current_url)
-        print(video_id)
         return video_id
 
 
