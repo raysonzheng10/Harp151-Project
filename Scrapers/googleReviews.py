@@ -3,13 +3,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.options import Options
 import time
 
 class GoogleReviewsScraper:
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        # Set up ChromeOptions for headless mode
+        options = Options()
+        options.add_argument("--headless=new")
+
+        self.driver = webdriver.Chrome(options=options)
         self.review_list = []
         self.driver.get('https://www.google.com/')
 
@@ -22,7 +25,6 @@ class GoogleReviewsScraper:
     # TODO: Make a helper function to factor out the way we select stars reviews
     
     def get_google_reviews(self, movie: str, review_amount: int) -> list[str]:
-        self.driver.maximize_window()
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
         )
@@ -78,8 +80,7 @@ class GoogleReviewsScraper:
         return self.review_list
         time.sleep(5)
 
-    def get_google_reviews(self, movie: str, review_amount: int, stars:int) -> list[str]:
-        self.driver.maximize_window()
+    def get_google_reviews_stars(self, movie: str, review_amount: int, stars:int) -> list[str]:
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
         )
@@ -189,6 +190,8 @@ class GoogleReviewsScraper:
 
         # use the extact video id function to get the video id from the url, return that value
         video_id = self.extract_video_id(current_url)
+
+        print(video_id)
         return video_id
 
 
