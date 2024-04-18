@@ -9,10 +9,10 @@ import time
 class GoogleReviewsScraper:
     def __init__(self):
         # Set up ChromeOptions for headless mode
-        options = Options()
-        options.add_argument("--headless=new")
+        # options = Options()
+        # options.add_argument("--headless=new")
 
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Chrome()
         self.review_list = []
         self.driver.get('https://www.google.com/')
 
@@ -183,7 +183,7 @@ class GoogleReviewsScraper:
         youtube_trailer_link = self.driver.find_element(By.XPATH, '/html/body/div[4]/div/div[13]/div[4]/div[5]/div/div/div[2]/div/div/div/div[1]/div[1]/a')
         youtube_trailer_link.click()
         
-        time.sleep(3)
+        time.sleep(5)
 
         # After getting to the yt trailer, get the url
         current_url = self.driver.current_url
@@ -191,10 +191,9 @@ class GoogleReviewsScraper:
         # use the extact video id function to get the video id from the url, return that value
         video_id = self.extract_video_id(current_url)
 
-        print(video_id)
         return video_id
 
 
 googleReviews = GoogleReviewsScraper()
 # print(googleReviews.get_google_reviews('the shining', 10, 1))
-googleReviews.get_YoutubeTrailer_Id('the dark knight')
+# googleReviews.get_YoutubeTrailer_Id('the dark knight')
