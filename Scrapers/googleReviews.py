@@ -194,6 +194,6 @@ class GoogleReviewsScraper:
         return video_id
 
 
-googleReviews = GoogleReviewsScraper()
+createdGoogleReviews = GoogleReviewsScraper()
 # print(googleReviews.get_google_reviews('the shining', 10, 1))
 # googleReviews.get_YoutubeTrailer_Id('the dark knight')
