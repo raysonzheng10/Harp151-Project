@@ -1,5 +1,4 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import statistics 
 from statistics import mean
 # statistics.mean, put all the compounds of the reviews onto a list and then get the average of it
 
@@ -14,7 +13,7 @@ def get_compound(reviews):
         compound_results.append(sentiment_result["compound"])
         print(review, "\n", "Rating:", sentiment_result["compound"])
 
-    average_compound = statistics.mean(compound_results)
+    average_compound = mean(compound_results)
     print("Overall Average Rating:", average_compound)
 
 reviews = ["tom is sooo funny","i love that movie!", "i hate that movie"]
