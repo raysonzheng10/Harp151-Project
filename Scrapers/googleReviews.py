@@ -152,7 +152,45 @@ class GoogleReviewsScraper:
         return self.review_list
         time.sleep(5)
 
+    # function to extract youtube video id from the url
+    def extract_video_id(self, url: str) -> str:
+        # Split the URL at 'v=' and get everything after that
+        video_id = url.split('v=')[1]
+
+        # If there are additional parameters after the video ID, remove them
+        if '&' in video_id:
+            video_id = video_id.split('&')[0]
+
+        return video_id
+    
+    def get_YoutubeTrailer_Id(self, movie: str) -> str:
+        WebDriverWait(self.driver, 5).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
+        )
+        
+        input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
+        input_element.clear()
+        input_element.send_keys(f"{movie} reviews" + Keys.ENTER)
+
+        # wait for the page to load
+        WebDriverWait(self.driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/div[4]/div/div[13]/div[4]/div[5]/div/div/div[2]/div/div/div/div[1]/div[1]/a'))
+        )
+
+        # Click on the youtube trailer link
+        youtube_trailer_link = self.driver.find_element(By.XPATH, '/html/body/div[4]/div/div[13]/div[4]/div[5]/div/div/div[2]/div/div/div/div[1]/div[1]/a')
+        youtube_trailer_link.click()
+        
+        time.sleep(3)
+
+        # After getting to the yt trailer, get the url
+        current_url = self.driver.current_url
+
+        video_id = self.extract_video_id(current_url)
+        print(video_id)
+        return video_id
 
 
 googleReviews = GoogleReviewsScraper()
-print(googleReviews.get_google_reviews('the shining', 10, 1))
+# print(googleReviews.get_google_reviews('the shining', 10, 1))
+googleReviews.get_YoutubeTrailer_Id('the dark knight')
