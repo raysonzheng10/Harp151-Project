@@ -52,11 +52,11 @@ class TMDB_API:
         # returns an empty list if unable to retrieve user reviews
     
     # # this method just combines getting the movie id and getting the reviews, might be obsolete?
-    # def get_reviews_from_title(self, movie:str, number_limit: int = 10) -> list[str]:
-    #     movie_id = self.get_movie_id(movie)
-    #     reviews = self.get_reviews_from_ID(movie_id, number_limit)
+    def get_reviews_from_title(self, movie:str, number_limit: int = 10) -> list[str]:
+        movie_id = self.get_movie_id(movie)
+        reviews = self.get_reviews_from_ID(movie_id, number_limit)
     
-    #     return reviews
+        return reviews
     
     # This method grabs the youtube video id based on a movie id, can be used later in youtube API
     def get_YoutubeTrailer_id(self, movie_id: str) -> str:
@@ -93,6 +93,6 @@ tmdb_API = TMDB_API(TMDB_APIKEY)
 
 # reviews = tmdb_API.get_reviews_from_title('the dark knight', 5)
 # print(reviews)
-id = tmdb_API.get_movie_id('interstellar')
+# id = tmdb_API.get_movie_id('interstellar')
 #print(tmdb_API.get_YoutubeTrailer_id(id))
-tmdb_API.get_movie_info(id)
+# tmdb_API.get_movie_info(id)
