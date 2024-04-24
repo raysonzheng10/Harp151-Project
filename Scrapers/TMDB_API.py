@@ -31,16 +31,20 @@ class TMDB_API:
         # returns a empty string if unable to find the movie id
     
     # define a method to grab the review based off a movie id, limiting to a default number of 10 reviews
-    def get_reviews_from_ID(self, movie_id:str, number_limit: int = 10) -> list[str]:
+    def get_reviews(self, movie_title:str, number_limit: int = 10) -> list[str]:
         reviews = []
+
+        movie_id = self.get_movie_id(movie_title)
+        if movie_id == "":
+            return False # if invalid id, return False
+
+        # make the api call
         url = f'{self.baseURL}/movie/{movie_id}/reviews?api_key={self.APIKEY}'
-        
         res = requests.get(url)
         data = res.json()
 
         try:
             results = data['results']
-
             # each entry has data on each user review, on what they wrote, their name, the date of posting, etc.
             for entry in results:
                 # check if the number of reviews exceeded the number limit
@@ -54,44 +58,28 @@ class TMDB_API:
         return reviews
         # returns an empty list if unable to retrieve user reviews
     
-    # # this method just combines getting the movie id and getting the reviews, might be obsolete?
-    def get_reviews_from_title(self, movie:str, number_limit: int = 10) -> list[str]:
-        movie_id = self.get_movie_id(movie)
-        reviews = self.get_reviews_from_ID(movie_id, number_limit)
-    
-        return reviews
-    
-    # This method grabs the youtube video id based on a movie id, can be used later in youtube API
-    def get_YoutubeTrailer_id(self, movie_id: str) -> str:
+    # This method grabs the youtube video id based on a movie title, can be used later in youtube API
+    def get_YoutubeTrailer_id(self, movie_title: str) -> str:
+        # get the corresponding TMDB movie id from the title
+        movie_id = self.get_movie_id(movie_title)
+        if movie_id == "":
+            return False # if the movie_id is invalid, return False
+
+        # make the api call
         url = f'{self.baseURL}/movie/{movie_id}/videos?api_key={self.APIKEY}&append_to_response=videos'
         res = requests.get(url)
         data = res.json()
 
+        # parse through the data
         results = data['results']
         for video in results:
             if video.get('type') == 'Trailer' and video.get('site') == 'YouTube':
+                # only grab id for trailer and Yt videos
                 return video.get('key')
-        #print(json.dumps(data, indent=3))
+        # returns an empty string if unsuccessful
 
-    # This method prints out a dictionary that contains basic information about a movie (title, description, genres)
-    def get_movie_info(self, movie_id: str) -> dict:
-        url = f'{self.baseURL}/movie/{movie_id}?api_key={self.APIKEY}'
-        res = requests.get(url)
-        data = res.json()
-
-        info = {}
-        genres = []
-        for genre in data['genres']:
-            genres.append(genre['name'])
-        info['title'] = data['original_title']
-        info['overview'] = data['overview']
-        info['genres'] = genres
-        info['image_path'] = data['poster_path']
-        #print(json.dumps(data, indent=3))
-        print(info)
-        return info
-
-    def show_image(self, image_path):
+    # this method saves a png of a given image path from the TMDB API
+    def save_image(self, image_path):
         url = f'{self.baseImageURL}/{image_path}'
         urllib.request.urlretrieve( 
         f'{url}', 
@@ -99,13 +87,32 @@ class TMDB_API:
         
         img = Image.open("poster.png") 
         img.show()
+    
+    # This method prints out a dictionary that contains basic information about a movie (title, description, genres)
+    def get_movie_info(self, movie_title: str) -> dict:
+        # get the corresponding TMDB movie id from the title
+        movie_id = self.get_movie_id(movie_title)
+        if movie_id == "":
+            return False # if bad movie_id, return False
+        
+        # make the api call
+        url = f'{self.baseURL}/movie/{movie_id}?api_key={self.APIKEY}'
+        res = requests.get(url)
+        data = res.json()
+
+        # grab the information and put it all in the info dictionary
+        info = {}
+        genres = []
+        for genre in data['genres']:
+            genres.append(genre['name'])
+        info['title'] = data['original_title']
+        info['overview'] = data['overview']
+        info['genres'] = genres
+
+        # calls a method to save the poster for later use
+        self.save_image(data['poster_path'])
+        return info
+
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
-
 tmdb_API = TMDB_API(TMDB_APIKEY)
-
-# reviews = tmdb_API.get_reviews_from_title('the dark knight', 5)
-# print(reviews)
-id = tmdb_API.get_movie_id('interstellar')
-#print(tmdb_API.get_YoutubeTrailer_id(id))
-tmdb_API.get_movie_info(id)
