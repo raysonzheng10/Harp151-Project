@@ -20,6 +20,7 @@ class TMDB_API:
         res = requests.get(url)
         data = res.json()
 
+        print(json.dumps(data['results'][0], indent=3))
         # parse through the data, if index/key error, means movie title was bad
         try:
             movie_id = data['results'][0]['id']
@@ -29,6 +30,37 @@ class TMDB_API:
 
         return movie_id
         # returns a empty string if unable to find the movie id
+
+# makes a method that returns similar movie titles, returns a list of lists
+    def get_similar_movies(self, movie_title:str) -> list[list[str]]:
+        # make api call
+        url = f'{self.baseURL}/search/movie?api_key={self.APIKEY}&query={movie_title}'
+        res = requests.get(url)
+        data = res.json()
+
+        titles = []
+        try:
+            all_movies = data['results']
+
+            for movie in all_movies:
+                # grab title and release date
+                title = movie['original_title']
+                release_date = movie['release_date']
+
+                # if no release date, movie hasn't come out yet so ignore
+                if release_date == '':
+                    continue
+                
+                release_year = release_date.split('-')[0] #use splicing to grab just the year
+                # store the title and release year as a list inside the titles list
+                titles.append([title,release_year])
+            
+            titles.pop(0)
+        except KeyError:
+            print("Invalid movie title.")
+
+        # if it didn't work, we return empty list
+        return titles
     
     # define a method to grab the review based off a movie id, limiting to a default number of 10 reviews
     def get_reviews(self, movie_title:str, number_limit: int = 10) -> list[str]:
@@ -116,3 +148,5 @@ class TMDB_API:
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
 tmdb_API = TMDB_API(TMDB_APIKEY)
+
+print(tmdb_API.get_similar_movies('star wars'))

@@ -27,7 +27,7 @@ class YouTubeAPI:
             top_comments.append(comment)
 
         return top_comments
-    
+
 
 # Youtube APIKey was created from the YT app
 YOUTUBE_APIKEY = 'AIzaSyBEzevk5Am8U4xhlgdTmMmuFRB7FtbIDQw'
