@@ -2,8 +2,7 @@
 import requests
 import json
 import urllib.request 
-from PIL import Image 
-
+import time
 # Make a class to handle all TMDB API interactions
 class TMDB_API:
     # initialize with apikey
@@ -20,7 +19,6 @@ class TMDB_API:
         res = requests.get(url)
         data = res.json()
 
-        print(json.dumps(data['results'][0], indent=3))
         # parse through the data, if index/key error, means movie title was bad
         try:
             movie_id = data['results'][0]['id']
@@ -31,7 +29,7 @@ class TMDB_API:
         return movie_id
         # returns a empty string if unable to find the movie id
 
-# makes a method that returns similar movie titles, returns a list of lists
+    # makes a method that returns similar movie titles, returns a list of lists
     def get_similar_movies(self, movie_title:str) -> list[list[str]]:
         # make api call
         url = f'{self.baseURL}/search/movie?api_key={self.APIKEY}&query={movie_title}'
@@ -116,9 +114,7 @@ class TMDB_API:
         urllib.request.urlretrieve( 
         f'{url}', 
         "poster.png") 
-        
-        img = Image.open("poster.png") 
-        img.show()
+        time.sleep(2)
     
     # This method prints out a dictionary that contains basic information about a movie (title, description, genres)
     def get_movie_info(self, movie_title: str) -> dict:
@@ -147,6 +143,4 @@ class TMDB_API:
 
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
-tmdb_API = TMDB_API(TMDB_APIKEY)
-
-print(tmdb_API.get_similar_movies('star wars'))
+CreatedTMDBAPI = TMDB_API(TMDB_APIKEY)
