@@ -188,4 +188,4 @@ class RottenTomatoesScraper:
 CreatedRottenTomatoesScraper = RottenTomatoesScraper()
 #CreatedRottenTomatoesScraper.get_critic_reviews("The shining")
 #CreatedRottenTomatoesScraper.get_audience_reviews("The Shining")
-CreatedRottenTomatoesScraper.get_topCritic_reviews("shining")
+# CreatedRottenTomatoesScraper.get_topCritic_reviews("shining")

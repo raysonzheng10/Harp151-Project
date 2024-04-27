@@ -127,11 +127,6 @@ class GoogleReviewsScraper:
         return video_id
 
 
-<<<<<<< Updated upstream
 createdGoogleReviews = GoogleReviewsScraper()
-=======
-googleReviews = GoogleReviewsScraper()
-googleReviews.get_google_reviews("the shining", 30)
->>>>>>> Stashed changes
 # print(googleReviews.get_google_reviews('the shining', 10, 1))
 # googleReviews.get_YoutubeTrailer_Id('the dark knight')
