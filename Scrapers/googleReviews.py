@@ -13,20 +13,16 @@ class GoogleReviewsScraper:
         options = Options()
         options.add_argument("--headless=new")
 
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Chrome(options = options)
         self.review_list = []
         self.driver.get('https://www.google.com/')
+        self.average_score = 0
 
-    # TODO: Combine both functions into the same one
-    # TODO: give default values to review_amount parameter and stars parameter
-    # (you can look at YoutubeAPI.py for an example as well)
-    # (we want to make it so that if we don't input any stars value, it will just default to grabing unordered reviews)
-    # (Right now, we don't have any way of grabbing unordered reviews)
-    # TODO: You can press the END key to scroll down. You need to click on the window first to select it, but you can grab a lot more reviews this way
-    # TODO: Make a helper function to factor out the way we select stars reviews
-    
     def get_google_reviews(self, movie: str, review_amount = 20, stars = 0) -> list[str]:
+        self.review_list = []
+        self.average_score = 0
         self.driver.get('https://www.google.com/')
+
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
         )
@@ -38,10 +34,14 @@ class GoogleReviewsScraper:
         #Finds the review box and clicks into it 
         try:
             WebDriverWait(self.driver,5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="kp-wp-tab-FilmReview"]/div[1]/div/div/div[2]/div[2]/div/div/div/div/div[2]/div[2]/div[1]'))
+            )
+            self.average_score = self.driver.find_element(By.XPATH, '//*[@id="kp-wp-tab-FilmReview"]/div[1]/div/div/div[2]/div[2]/div/div/div/div/div[2]/div[2]/div[1]').text
+            self.average_score += " out of 5"
+            WebDriverWait(self.driver,5).until(
                 EC.element_to_be_clickable((By.CLASS_NAME,"e8eHnd"))
             )
             self.driver.find_element(By.CLASS_NAME,"e8eHnd").click()
-            time.sleep(5)
             if stars != 0:
                 WebDriverWait(self.driver,5).until(
                     EC.element_to_be_clickable((By.CLASS_NAME, "zbTRdb"))
@@ -70,7 +70,6 @@ class GoogleReviewsScraper:
                         review.click()
             except:
                 print("")
-            time.sleep(5)
             for i in range(review_amount):
                 j = 2 * i
                 reviews = self.driver.find_elements(By.CLASS_NAME, "T7nuU")
@@ -85,45 +84,6 @@ class GoogleReviewsScraper:
         
 
 
-    # function to extract youtube video id from the url
-    def extract_video_id(self, url: str) -> str:
-        # Split the URL at 'v=' and get everything after that
-        video_id = url.split('v=')[1]
-
-        # If there are additional parameters after the video ID, remove them
-        if '&' in video_id:
-            video_id = video_id.split('&')[0]
-
-        # return the string value
-        return video_id
-    
-    def get_YoutubeTrailer_Id(self, movie: str) -> str:
-        WebDriverWait(self.driver, 5).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
-        )
-        
-        input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
-        input_element.clear()
-        input_element.send_keys(f"{movie} reviews" + Keys.ENTER)
-
-        # wait for the page to load
-        WebDriverWait(self.driver, 5).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/div[4]/div/div[13]/div[4]/div[5]/div/div/div[2]/div/div/div/div[1]/div[1]/a'))
-        )
-
-        # Click on the youtube trailer link
-        youtube_trailer_link = self.driver.find_element(By.XPATH, '/html/body/div[4]/div/div[13]/div[4]/div[5]/div/div/div[2]/div/div/div/div[1]/div[1]/a')
-        youtube_trailer_link.click()
-        
-        time.sleep(5)
-
-        # After getting to the yt trailer, get the url
-        current_url = self.driver.current_url
-
-        # use the extact video id function to get the video id from the url, return that value
-        video_id = self.extract_video_id(current_url)
-
-        return video_id
-
 
 createdGoogleReviews = GoogleReviewsScraper()
+
