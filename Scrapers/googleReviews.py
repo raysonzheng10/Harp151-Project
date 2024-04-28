@@ -9,11 +9,11 @@ import time
 
 class GoogleReviewsScraper:
     def __init__(self):
-        # Set up ChromeOptions for headless mode
-        # options = Options()
-        # options.add_argument("--headless=new")
+        #Set up ChromeOptions for headless mode
+        options = Options()
+        options.add_argument("--headless=new")
 
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(options=options)
         self.review_list = []
         self.driver.get('https://www.google.com/')
 
@@ -26,10 +26,10 @@ class GoogleReviewsScraper:
     # TODO: Make a helper function to factor out the way we select stars reviews
     
     def get_google_reviews(self, movie: str, review_amount = 20, stars = 0) -> list[str]:
+        self.driver.get('https://www.google.com/')
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
         )
-        self.driver.maximize_window()
         # the input_element represents the search bar, we clear it and send in the text 'tech with tim' and then press ENTER
         input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
         input_element.clear()
@@ -74,7 +74,6 @@ class GoogleReviewsScraper:
             for i in range(review_amount):
                 j = 2 * i
                 reviews = self.driver.find_elements(By.CLASS_NAME, "T7nuU")
-            #print(reviews[i][0:10])
                 if reviews[j+1].text == "":
                     self.review_list.append(reviews[j+2].text)
                 else:
@@ -128,5 +127,3 @@ class GoogleReviewsScraper:
 
 
 createdGoogleReviews = GoogleReviewsScraper()
-# print(googleReviews.get_google_reviews('the shining', 10, 1))
-# googleReviews.get_YoutubeTrailer_Id('the dark knight')
