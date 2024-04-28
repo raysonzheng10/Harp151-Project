@@ -61,7 +61,7 @@ class TMDB_API:
         return titles
     
     # define a method to grab the review based off a movie id, limiting to a default number of 10 reviews
-    def get_reviews(self, movie_title:str, number_limit: int = 10) -> list[str]:
+    def get_reviews(self, movie_title:str, number_limit: int = 20) -> list[str]:
         reviews = []
 
         movie_id = self.get_movie_id(movie_title)

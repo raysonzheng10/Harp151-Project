@@ -1,63 +1,31 @@
 from Scrapers.TMDB_API import CreatedTMDBAPI
-from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
+# from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
+from Scrapers.youtubeAPI import CreatedYoutubeAPI
 from VaderSentiment import get_compound
 from tkinter import *
-from tkint import get_scaled_image
-from PIL import Image, ImageTk
+from tkint_helper import *
 
+# this function will run when the user presses the search button
+def mainProcess(movie_title):
+    # first we try to extract all relevant info using TMDB API
+    movie_info = CreatedTMDBAPI.get_movie_info(movie_title)
 
-# rotten tomatoes and youtube
-
-# def get_tomatoes_reviews(movie_title):
-#     tomato_text.delete('1.0', 'end')
-#     tomatoes_reviews = CreatedRottenTomatoesScraper.get_topCritic_reviews(movie_title)
-
-#     for review in tomatoes_reviews:
-#         text = f"{review} \n\n"
-#         tomato_text.insert(END, text)
-#         tomato_text.tag_config("tag_name", justify = "center")
-#         tomato_text.tag_add("tag_name", "1.0", "end")
-
-#     return tomatoes_reviews
-
-# def get_tmdb_reviews(movie_title):
-#     tmdb_text.delete('1.0','end')
-#     tmdb_reviews = CreatedTMDBAPI.get_reviews(movie_title)
-
-#     for review in tmdb_reviews:
-#         text = f"{review} \n\n"
-#         tmdb_text.insert(END, text)
-#         tmdb_text.tag_config("tag_name", justify = "center")
-#         tmdb_text.tag_add("tag_name", "1.0", "end")
-
-#     return tmdb_reviews
-
-# def update_image():
-#     tk_photo = get_scaled_image(path = r"poster.png", width = 200, height = 300)
-#     poster.create_image(100, 150, image=tk_photo)
-#     poster.image = tk_photo
-
-# def update_movie_info(movie_info):
-#     title.config(text=movie_info['title'])
-
-
-
-
-#     print('finished updating')
-
-# def mainProcess(movie_title):
-#     tmdb_reviews = get_tmdb_reviews(movie_title)
-#     tomatoes_reviews = get_tomatoes_reviews(movie_title)
-
-#     tmdb_score = get_compound(tmdb_reviews)
-#     tomatoes_score = get_compound(tomatoes_reviews)
-
-#     tmdb_rating.config(text=f"TMDB Score: {tmdb_score}")
-#     tomato_rating.config(text=f"tomato Score: {tomatoes_score}")
+    # movie_info is false if we failed
+    if not movie_info:
+        print("Movie Title is not recognized. Please Try Again.")
+        return
     
-#     movie_info = CreatedTMDBAPI.get_movie_info(movie_title)
-#     update_image()
-#     update_movie_info(movie_info)
+    # grab the title from the API call and use that title for the rest of the calls
+    title = movie_info['title']
+    # get the video id for the youtube trailer
+    video_id = CreatedTMDBAPI.get_YoutubeTrailer_id(title)
+
+    # grab reviews from various platforms
+    tmdb_reviews = CreatedTMDBAPI.get_reviews(title)
+    youtube_reviews = CreatedYoutubeAPI.get_top_comments(video_id) #use video id instead of title
+
+    print(tmdb_reviews[0])
+    print(youtube_reviews[0])
 
 
 
@@ -66,34 +34,28 @@ root = Tk()
 root.geometry("1000x750")
 root.title("Movie Review Compiler")
 
-white = "#eff0f0"
-primary = "#15244B"
-secondary = "#0088ca"
-font = "Helvetica"
-
 # header frame
-header = Frame(root, bg = primary, height = 10)
-header.grid(row = 0, column = 0, sticky = "ew")
+header_frame = Frame(root, bg = primary, height = 10)
+header_frame.grid(row = 0, column = 0, sticky = "ew")
 
-header_label = Label(header, text = "Movie Review Compiler", font = (font, 15, "bold"), bg = primary, fg = white)
+
+header_label = Label(header_frame, text = "Movie Review Compiler", font = (font, 15, "bold"), bg = primary, fg = white)
 header_label.grid(row = 0, column = 0, padx = 12, sticky = "ew")
 
 # search bar
 movie_name = StringVar()
 
-def get_movie():
-    movie = movie_name.get()
-
+def get_movie(movie):
     print(movie)
     movie_name.set("")
 
-movie_name_entry = Entry(header, textvariable = movie_name, font = (font, 15), bg = white, fg = primary, justify = LEFT, borderwidth = 5, relief = FLAT)
+movie_name_entry = Entry(header_frame, textvariable = movie_name, font = (font, 15), bg = white, fg = primary, justify = LEFT, borderwidth = 5, relief = FLAT)
 movie_name_entry.grid(row = 0, column = 1, sticky = "e", padx = (450, 10), pady = 10)
 
 # search icon
 search_icon_size = 30
-tk_search_icon = get_scaled_image(r'search_btn.png', search_icon_size, search_icon_size)
-get_movie_btn = Button(header, command = get_movie, width = search_icon_size, height=search_icon_size, bg = secondary, image = tk_search_icon)
+tk_search_icon = get_scaled_image(r'images\search_btn.png', search_icon_size, search_icon_size)
+get_movie_btn = Button(header_frame, command = lambda: get_movie(movie_name.get()), width = search_icon_size, height=search_icon_size, bg = secondary, image = tk_search_icon)
 get_movie_btn.grid(row = 0, column = 2, padx = 15)
 
 # # Create Main_frame
