@@ -106,7 +106,9 @@ class TMDB_API:
             if video.get('type') == 'Trailer' and video.get('site') == 'YouTube':
                 # only grab id for trailer and Yt videos
                 return video.get('key')
-        # returns an empty string if unsuccessful
+            
+        return False
+        # returns False if unsuccessful
 
     # this method saves a png of a given image path from the TMDB API
     def save_image(self, image_path):

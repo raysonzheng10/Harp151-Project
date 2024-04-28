@@ -26,3 +26,7 @@ primary = "#15244B"
 secondary = "#0088ca"
 font = "Helvetica"
 
+platform_selections = ["Rotten Tomatoes",
+                       "Youtube",
+                       "Google Reviews",
+                       "TMDB"]
