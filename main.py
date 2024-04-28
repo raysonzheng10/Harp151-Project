@@ -5,6 +5,30 @@ from VaderSentiment import get_compound
 from tkinter import *
 from tkint_helper import *
 
+# function that updates the image in the poster
+def update_poster():
+    tk_poster = get_scaled_image(path = r"images\poster.png", width = 200, height = 300)
+    poster.create_image(100, 150, image = tk_poster)
+    poster.image = tk_poster
+
+
+def update_MI_frame(movie_info):
+    # update image for poster
+    update_poster()
+
+    # grab information from the dict
+    title = movie_info['title']
+    release_date = movie_info['release_date']
+    overview = movie_info['overview']
+
+    genres = movie_info['genres']
+    genre_text = get_genre_text(genres)
+
+    title_label.config(text = f'{title} ({release_date})')
+    genres_label.config(text = genre_text)
+    description_label.config(text = f'{overview}')
+
+
 # this function will run when the user presses the search button
 def mainProcess(movie_title):
     # first we try to extract all relevant info using TMDB API
@@ -14,7 +38,7 @@ def mainProcess(movie_title):
     if not movie_info:
         print("Movie Title is not recognized. Please Try Again.")
         return
-    
+
     # grab the title from the API call and use that title for the rest of the calls
     title = movie_info['title']
     # get the video id for the youtube trailer
@@ -24,8 +48,10 @@ def mainProcess(movie_title):
     tmdb_reviews = CreatedTMDBAPI.get_reviews(title)
     youtube_reviews = CreatedYoutubeAPI.get_top_comments(video_id) #use video id instead of title
 
-    print(tmdb_reviews[0])
-    print(youtube_reviews[0])
+
+    # use that information to update the tkinter window
+    update_MI_frame(movie_info)
+
 
 
 
@@ -34,6 +60,7 @@ root = Tk()
 root.geometry("1000x750")
 root.title("Movie Review Compiler")
 
+# <------------------------------------------------- HEADER FRAME ------------------------------------------------->
 # header frame
 header_frame = Frame(root, bg = primary, height = 10)
 header_frame.grid(row = 0, column = 0, sticky = "ew")
@@ -55,9 +82,31 @@ movie_name_entry.grid(row = 0, column = 1, sticky = "e", padx = (450, 10), pady 
 # search icon
 search_icon_size = 30
 tk_search_icon = get_scaled_image(r'images\search_btn.png', search_icon_size, search_icon_size)
-get_movie_btn = Button(header_frame, command = lambda: get_movie(movie_name.get()), width = search_icon_size, height=search_icon_size, bg = secondary, image = tk_search_icon)
+get_movie_btn = Button(header_frame, command = lambda: mainProcess(movie_name.get()), width = search_icon_size, height=search_icon_size, bg = secondary, image = tk_search_icon)
 get_movie_btn.grid(row = 0, column = 2, padx = 15)
 
+# <------------------------------------------------- MOVIE INFORMATION FRAME ------------------------------------------------->
+# movie info frame
+movie_information_frame = Frame(root, bg = white, height = 200)
+movie_information_frame.grid(row = 1, column = 0, sticky = "ew", pady=(10, 0))
+
+# Separete into left and right sections
+left_MI_frame = Frame(movie_information_frame)
+left_MI_frame.grid(row = 0, column = 0)
+right_MI_frame = Frame(movie_information_frame)
+right_MI_frame.grid(row = 0, column = 1)
+
+# poster image
+poster = Canvas(left_MI_frame, width = 200, height = 300, background = "white")
+poster.pack()
+
+# elements for right MI frame
+title_label = Label(right_MI_frame, text="placeholder title", background= white)
+title_label.pack()
+genres_label = Label(right_MI_frame, text="placeholder genres", background= white)
+genres_label.pack()
+description_label = Label(right_MI_frame, text="placeholder description", background = white)
+description_label.pack()
 # # Create Main_frame
 # main_frame = Frame(root)
 # main_frame.place(x=400, y=400, anchor=CENTER)

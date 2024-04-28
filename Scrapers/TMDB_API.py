@@ -113,7 +113,7 @@ class TMDB_API:
         url = f'{self.baseImageURL}/{image_path}'
         urllib.request.urlretrieve( 
         f'{url}', 
-        "poster.png") 
+        r"images\poster.png") 
         time.sleep(2)
     
     # This method prints out a dictionary that contains basic information about a movie (title, description, genres)
@@ -135,6 +135,7 @@ class TMDB_API:
             genres.append(genre['name'])
         info['title'] = data['original_title']
         info['overview'] = data['overview']
+        info['release_date'] = data['release_date'].split("-")[0]
         info['genres'] = genres
 
         # calls a method to save the poster for later use
