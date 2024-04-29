@@ -163,5 +163,3 @@ class TMDB_API:
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
 CreatedTMDBAPI = TMDB_API(TMDB_APIKEY)
-
-print(CreatedTMDBAPI.get_similar_movies('home alone'))
