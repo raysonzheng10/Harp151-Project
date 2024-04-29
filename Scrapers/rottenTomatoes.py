@@ -122,7 +122,7 @@ class RottenTomatoesScraper:
         except:
             print("Movie reviews not found")
 
-    def get_review_score(self, movie_title:str) -> list[str]
+    def get_review_score(self, movie_title:str) -> list[str]:
         self.review_scores=[]
         self.driver.get('https://www.google.com/')
         WebDriverWait(self.driver, 2).until(
