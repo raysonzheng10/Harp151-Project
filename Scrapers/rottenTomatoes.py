@@ -17,6 +17,7 @@ class RottenTomatoesScraper:
         self.critic_review_list = []
         self.review_list = []
         self.driver.get('https://www.google.com/')
+        self.review_scores = []
         self.average_score = 0
     
     # returns a list of top critic reviews for a given movie title
@@ -121,6 +122,27 @@ class RottenTomatoesScraper:
         except:
             print("Movie reviews not found")
 
-
+    def get_review_score(self, movie_title:str) -> list[str]:
+        self.review_scores=[]
+        self.driver.get('https://www.google.com/')
+        WebDriverWait(self.driver, 2).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
+        )
+        input_element = self.driver.find_element(By.CLASS_NAME, "gLFyf")
+        input_element.clear()
+        input_element.send_keys(f"rotten tomatoes {movie_title}" + Keys.ENTER)
+        WebDriverWait(self.driver, 2).until(
+                EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, "Rotten Tomatoes"))
+            )
+        self.driver.find_element(By.PARTIAL_LINK_TEXT, "Rotten Tomatoes").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[1]/rt-text'))
+        )
+        tomatometer = self.driver.find_element(By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[1]/rt-text').text
+        audience_score = self.driver.find_element(By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[2]/rt-text').text
+        self.review_scores.append(tomatometer)
+        self.review_scores.append(audience_score)
+        
 CreatedRottenTomatoesScraper = RottenTomatoesScraper()
-print(CreatedRottenTomatoesScraper.get_critic_reviews('hush'))
+#print(CreatedRottenTomatoesScraper.get_critic_reviews('hush'))
+
