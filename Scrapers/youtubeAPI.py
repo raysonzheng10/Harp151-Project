@@ -9,7 +9,7 @@ class YouTubeAPI:
         self.baseURL = 'https://www.googleapis.com/youtube/v3'
 
     # define a method to grab the top comments from a specific video
-    def get_top_comments(self, video_id: str, number_limit: int = 20) -> list[str]:
+    def get_top_comments(self, video_id: str, number_limit: int = 30) -> list[str]:
         top_comments = []
         url = f'{self.baseURL}/commentThreads?part=snippet&videoId={video_id}&key={self.APIKEY}&order=relevance&maxResults={number_limit}'
         

@@ -111,12 +111,12 @@ class TMDB_API:
         # returns False if unsuccessful
 
     # this method saves a png of a given image path from the TMDB API
-    def save_image(self, image_path):
+    def save_image(self, image_path: str) -> None:
         url = f'{self.baseImageURL}/{image_path}'
         urllib.request.urlretrieve( 
         f'{url}', 
         r"images\poster.png") 
-        time.sleep(2)
+        # no return value
     
     # This method prints out a dictionary that contains basic information about a movie (title, description, genres)
     def get_movie_info(self, movie_title: str) -> dict:
@@ -130,6 +130,7 @@ class TMDB_API:
         res = requests.get(url)
         data = res.json()
 
+        print(json.dumps(data, indent=3))
         # grab the information and put it all in the info dictionary
         info = {}
         genres = []
@@ -140,10 +141,27 @@ class TMDB_API:
         info['release_date'] = data['release_date'].split("-")[0]
         info['genres'] = genres
 
+
         # calls a method to save the poster for later use
         self.save_image(data['poster_path'])
         return info
 
+    def get_average_rating(self, movie_title: str) -> str:
+        # get the corresponding TMDB movie id from the title
+        movie_id = self.get_movie_id(movie_title)
+        if movie_id == "":
+            return False # if bad movie_id, return False
+        
+        # make the api call
+        url = f'{self.baseURL}/movie/{movie_id}?api_key={self.APIKEY}'
+        res = requests.get(url)
+        data = res.json()
+
+        # grab the rating from the json
+        rating = data['vote_average']
+        return rating
+
 
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
 CreatedTMDBAPI = TMDB_API(TMDB_APIKEY)
+

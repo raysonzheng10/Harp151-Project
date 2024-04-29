@@ -85,4 +85,4 @@ class GoogleReviewsScraper:
 
 
 CreatedGoogleReviews = GoogleReviewsScraper()
-
+CreatedGoogleReviews.get_google_reviews('interstellar')

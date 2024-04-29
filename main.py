@@ -29,32 +29,61 @@ def update_MI_frame(movie_info):
     genres_label.config(text = genre_text)
     description_label.config(text = f'{overview}')
 
+# function to clear all text from the text widgets
+def clear_text():
+    good_review_text.delete('1.0', 'end')
+    bad_review_text.delete('1.0', 'end')
+
+# updates text boxes with reviews
+def update_review_texts(good_reviews, bad_reviews):
+    for review in good_reviews:
+        text = f"{review} \n\n"
+        good_review_text.insert(END, text)
+        good_review_text.tag_config("tag_name", justify = "center")
+        good_review_text.tag_add("tag_name", "1.0", "end")
+
+    for review in bad_reviews:
+        text = f"{review} \n\n"
+        bad_review_text.insert(END, text)
+        bad_review_text.tag_config("tag_name", justify = "center")
+        bad_review_text.tag_add("tag_name", "1.0", "end")
+
+def update_rating(rating):
+    rating_label.config(text=f'Rating: {rating}')
+
 # function that grabs reviews according to the platform on the dropdown menu
 # displays reviews in the text box
 def process_platformSelection(platform):
     print(f"Grabbing reviews on {platform} for {title}....")
     # clear all review text
-    review_text.delete('1.0', 'end')
+    clear_text()
 
     # this is basically a bunch of if statements, check which platform we are using
     match platform:
         case "Rotten Tomatoes":
             reviews = CreatedRottenTomatoesScraper.get_critic_reviews(title)
+            rating = 'tomatoes'
         case "Youtube": 
             # for youtube, we have to grab the yt trailer id first
             video_id = CreatedTMDBAPI.get_YoutubeTrailer_id(title)
             reviews = CreatedYoutubeAPI.get_top_comments(video_id)
+
+            rating = CreatedYoutubeAPI.get_likes_views_ratio(video_id)[2] + "Likes to Views Percentage"
         case "Google Reviews":
             reviews = CreatedGoogleReviews.get_google_reviews(title)
+
+            rating = CreatedGoogleReviews.average_score
         case "TMDB":
             reviews = CreatedTMDBAPI.get_reviews(title)
+
+            rating = CreatedTMDBAPI.get_average_rating(title)
         case _:
-            review_text.insert(END, "Please select a platform using the dropdown menu.")
+            good_review_text.insert(END, "Please select a platform using the dropdown menu.")
             return
     
     # if reviews is empty, we weren't able to successfully grab any, so we exit and show error
     if len(reviews) == 0:
-        review_text.insert(END, f"No reviews found on {platform}.")
+        good_review_text.insert(END, f"No reviews found on {platform}.")
         return
     
     # use vader sentiment to sort reviews into good/bad
@@ -62,11 +91,9 @@ def process_platformSelection(platform):
     good_reviews = sorted_reviews[0]
     bad_reviews = sorted_reviews[1]
 
-    for review in bad_reviews:
-        text = f"{review} \n\n"
-        review_text.insert(END, text)
-        review_text.tag_config("tag_name", justify = "center")
-        review_text.tag_add("tag_name", "1.0", "end")
+    # update all associated widgets
+    update_review_texts(good_reviews, bad_reviews)
+    update_rating(rating)
     
     print(f"Successfully grabbed reviews on {platform} for {title}! \n")
 
@@ -164,8 +191,11 @@ rating_label.pack()
 bot_reviews_frame = Frame(reviews_frame, bg = white)
 bot_reviews_frame.grid(row = 1, column = 0)
 
-review_text = Text(bot_reviews_frame, width = 100, height = 25, padx = 5, borderwidth = 5)
-review_text.pack()
+good_review_text = Text(bot_reviews_frame, width = 50, height = 25, padx = 5, borderwidth = 5)
+good_review_text.grid(row = 0, column= 0)
+
+bad_review_text = Text(bot_reviews_frame, width = 50, height = 25, padx = 5, borderwidth = 5)
+bad_review_text.grid(row = 0, column= 1)
 
 
 
