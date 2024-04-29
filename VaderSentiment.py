@@ -29,10 +29,10 @@ def separate_good_bad(reviews):
         general_sentiment = result["compound"]
 
         # sort reviews based on negative/positive
-        if general_sentiment > 0:
-            good_reviews.append(review)
-        else:
+        if general_sentiment < -0.2:
             bad_reviews.append(review)
+        else:
+            good_reviews.append(review)
 
     # return as a tuple
     return good_reviews, bad_reviews

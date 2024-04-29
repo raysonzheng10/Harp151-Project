@@ -1,7 +1,7 @@
 from Scrapers.TMDB_API import CreatedTMDBAPI
 from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
 from Scrapers.youtubeAPI import CreatedYoutubeAPI
-from Scrapers.googleReviews import createdGoogleReviews
+from Scrapers.googleReviews import CreatedGoogleReviews
 from VaderSentiment import *
 from tkinter import *
 from tkint_helper import *
@@ -32,7 +32,7 @@ def update_MI_frame(movie_info):
 # function that grabs reviews according to the platform on the dropdown menu
 # displays reviews in the text box
 def process_platformSelection(platform):
-    print(f"Attempting to grab reviews on {platform} for {title}")
+    print(f"Grabbing reviews on {platform} for {title}....")
     # clear all review text
     review_text.delete('1.0', 'end')
 
@@ -49,33 +49,37 @@ def process_platformSelection(platform):
         case "TMDB":
             reviews = CreatedTMDBAPI.get_reviews(title)
         case _:
-            review_text.delete('1.0', 'end')
             review_text.insert(END, "Please select a platform using the dropdown menu.")
             return
-        
-    review_text.delete('1.0', 'end')
+    
+    # if reviews is empty, we weren't able to successfully grab any, so we exit and show error
     if len(reviews) == 0:
         review_text.insert(END, f"No reviews found on {platform}.")
         return
     
-    for review in reviews:
+    # use vader sentiment to sort reviews into good/bad
+    sorted_reviews = separate_good_bad(reviews)
+    good_reviews = sorted_reviews[0]
+    bad_reviews = sorted_reviews[1]
+
+    for review in bad_reviews:
         text = f"{review} \n\n"
         review_text.insert(END, text)
         review_text.tag_config("tag_name", justify = "center")
         review_text.tag_add("tag_name", "1.0", "end")
     
-    print(f"SUCCESS: {title} | {platform}")
-        
+    print(f"Successfully grabbed reviews on {platform} for {title}! \n")
 
 # this function will run when the user presses the search button
 def mainProcess(movie_title):
     # first we try to extract all relevant info using TMDB API
     movie_info = CreatedTMDBAPI.get_movie_info(movie_title)
 
-    # movie_info is false if we failed
+    # movie_info is false if we failed, let user know of this as well
     if not movie_info:
-        print("Movie Title is not recognized. Please Try Again.")
+        search_error_label.config(text = "Movie Title is not recognized. Please Try Again.")
         return
+    search_error_label.config(text = "") # if it was good, reset the label to be nothing
 
     # use that information to update the tkinter window
     update_MI_frame(movie_info)
@@ -131,6 +135,8 @@ poster = Canvas(left_MI_frame, width = 200, height = 300, background = white)
 poster.pack()
 
 # elements for right MI frame
+search_error_label = Label(right_MI_frame, text="placeholder error", background= white, fg = 'Red')
+search_error_label.pack()
 title_label = Label(right_MI_frame, text="placeholder title", background= white)
 title_label.pack()
 genres_label = Label(right_MI_frame, text="placeholder genres", background= white)
