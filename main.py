@@ -62,20 +62,17 @@ def process_platformSelection(platform):
     match platform:
         case "Rotten Tomatoes":
             reviews = CreatedRottenTomatoesScraper.get_critic_reviews(title)
-            rating = 'tomatoes'
+            rating = CreatedRottenTomatoesScraper.get_review_score(title)
         case "Youtube": 
             # for youtube, we have to grab the yt trailer id first
             video_id = CreatedTMDBAPI.get_YoutubeTrailer_id(title)
             reviews = CreatedYoutubeAPI.get_top_comments(video_id)
-
-            rating = CreatedYoutubeAPI.get_likes_views_ratio(video_id)[2] + "Likes to Views Percentage"
+            rating = CreatedYoutubeAPI.get_likes_views_ratio(video_id)[2] + " Likes to Views Percentage"
         case "Google Reviews":
             reviews = CreatedGoogleReviews.get_google_reviews(title)
-
             rating = CreatedGoogleReviews.average_score
         case "TMDB":
             reviews = CreatedTMDBAPI.get_reviews(title)
-
             rating = CreatedTMDBAPI.get_average_rating(title)
         case _:
             good_review_text.insert(END, "Please select a platform using the dropdown menu.")
@@ -116,7 +113,6 @@ def mainProcess(movie_title):
     movie_name.set("")
 
     process_platformSelection(platform_selector.get())
-
 
 
 # Create Root

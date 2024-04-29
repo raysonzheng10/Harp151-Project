@@ -71,6 +71,3 @@ video_id = 'cqGjhVJdasdsaWtEg'
 
 # create an instance of the YouTubeAPI Class
 CreatedYoutubeAPI = YouTubeAPI(YOUTUBE_APIKEY)
-
-# print(CreatedYoutubeAPI.get_top_comments('asd'))
-# print(CreatedYoutubeAPI.get_likes_views_ratio(video_id))

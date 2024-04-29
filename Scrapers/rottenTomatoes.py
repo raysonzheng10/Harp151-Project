@@ -142,7 +142,8 @@ class RottenTomatoesScraper:
         audience_score = self.driver.find_element(By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[2]/rt-text').text
         self.review_scores.append(tomatometer)
         self.review_scores.append(audience_score)
+
+        return tomatometer
         
 CreatedRottenTomatoesScraper = RottenTomatoesScraper()
-#print(CreatedRottenTomatoesScraper.get_critic_reviews('hush'))
 
