@@ -25,7 +25,7 @@ class YouTubeAPI:
                 comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
                 top_comments.append(comment)
         except KeyError:
-            print('Unable to grab comments from Youtube')
+            pass
 
         # returns empty list if failed
         return top_comments
@@ -58,8 +58,8 @@ class YouTubeAPI:
             views = video_data['viewCount']
             ratio = self.get_ratio(likes, views)
 
-        except IndexError or KeyError:
-            print("Invalid Video Id.")
+        except:
+            print("Unable to grab all data.")
             return
         # returns None value if unsuccessful
         return likes, views, ratio
@@ -67,7 +67,7 @@ class YouTubeAPI:
 
 # Youtube APIKey was created from the YT app
 YOUTUBE_APIKEY = 'AIzaSyBEzevk5Am8U4xhlgdTmMmuFRB7FtbIDQw'
-video_id = 'cqGjhVJdasdsaWtEg' 
+video_id = 'yFrxzaBLDQM' 
 
 # create an instance of the YouTubeAPI Class
 CreatedYoutubeAPI = YouTubeAPI(YOUTUBE_APIKEY)

@@ -89,7 +89,7 @@ class TMDB_API:
         # returns an empty list if unable to retrieve user reviews
     
     # This method grabs the youtube video id based on a movie title, can be used later in youtube API
-    def get_YoutubeTrailer_id(self, movie_title: str) -> str:
+    def get_YoutubeTrailer_ids(self, movie_title: str) -> str:
         # get the corresponding TMDB movie id from the title
         movie_id = self.get_movie_id(movie_title)
         if movie_id == "":
@@ -100,15 +100,15 @@ class TMDB_API:
         res = requests.get(url)
         data = res.json()
 
+        video_ids = []
         # parse through the data
         results = data['results']
         for video in results:
             if video.get('type') == 'Trailer' and video.get('site') == 'YouTube':
                 # only grab id for trailer and Yt videos
-                return video.get('key')
+                video_ids.append(video.get('key'))
             
-        return False
-        # returns False if unsuccessful
+        return video_ids
 
     # this method saves a png of a given image path from the TMDB API
     def save_image(self, image_path: str) -> None:
@@ -130,7 +130,6 @@ class TMDB_API:
         res = requests.get(url)
         data = res.json()
 
-        print(json.dumps(data, indent=3))
         # grab the information and put it all in the info dictionary
         info = {}
         genres = []
@@ -165,3 +164,4 @@ class TMDB_API:
 TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
 CreatedTMDBAPI = TMDB_API(TMDB_APIKEY)
 
+print(CreatedTMDBAPI.get_similar_movies('home alone'))

@@ -65,9 +65,20 @@ def process_platformSelection(platform):
             rating = CreatedRottenTomatoesScraper.get_review_score(title)
         case "Youtube": 
             # for youtube, we have to grab the yt trailer id first
-            video_id = CreatedTMDBAPI.get_YoutubeTrailer_id(title)
-            reviews = CreatedYoutubeAPI.get_top_comments(video_id)
-            rating = CreatedYoutubeAPI.get_likes_views_ratio(video_id)[2] + " Likes to Views Percentage"
+            # we grab a list of video ids, scan through videos until we find one with comments
+            video_ids = CreatedTMDBAPI.get_YoutubeTrailer_ids(title) 
+            for id in video_ids:
+                reviews = CreatedYoutubeAPI.get_top_comments(id)
+
+                # try to grab rating, if unsuccessful, give default value
+                try:
+                    rating = CreatedYoutubeAPI.get_likes_views_ratio(id)[2] + " Likes to Views Percentage "
+                except:
+                    rating = 'N/A'
+                    
+                if len(reviews) == 0: # if this video failed, try next one
+                    continue
+
         case "Google Reviews":
             reviews = CreatedGoogleReviews.get_google_reviews(title)
             rating = CreatedGoogleReviews.average_score
@@ -78,6 +89,9 @@ def process_platformSelection(platform):
             good_review_text.insert(END, "Please select a platform using the dropdown menu.")
             return
     
+    # update rating value
+    update_rating(rating)
+
     # if reviews is empty, we weren't able to successfully grab any, so we exit and show error
     if len(reviews) == 0:
         good_review_text.insert(END, f"No reviews found on {platform}.")
@@ -88,9 +102,8 @@ def process_platformSelection(platform):
     good_reviews = sorted_reviews[0]
     bad_reviews = sorted_reviews[1]
 
-    # update all associated widgets
+    # update all text widgets
     update_review_texts(good_reviews, bad_reviews)
-    update_rating(rating)
     
     print(f"Successfully grabbed reviews on {platform} for {title}! \n")
 
