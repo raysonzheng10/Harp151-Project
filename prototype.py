@@ -66,9 +66,6 @@ movie_input.grid(row = 1, column=0)
 button = Button(top_frame, text = "Get Reviews", command = lambda: get_reviews(movie_title.get()))
 button.grid(row=2,column=0)
 
-
-
-
 # creates 2 text boxes in bottom frame
 tomato_text = Text(body_frame, width = 45, height = 25, padx = 5, borderwidth = 5)
 tomato_text.grid(row = 1, column = 0)
