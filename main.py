@@ -118,7 +118,7 @@ def mainProcess(movie_title):
 
     # movie_info is false if we failed, let user know of this as well
     if not movie_info:
-        search_error_label.config(text = "Movie Title is not recognized. Please Try Again.")
+        search_error_label.config(text = "Movie Title is not recognized.")
         return
     search_error_label.config(text = "") # if it was good, reset the label to be nothing
 
@@ -176,15 +176,27 @@ poster.grid(row = 0, column = 0, padx = (10,0), sticky = "nw")
 
 # elements for right MI frame
 
-top_description_frame = Frame(right_MI_frame)
+#  -------------------- top description frame --------------------
+top_description_frame = Frame(right_MI_frame, bg = white)
 top_description_frame.grid(row = 0, column = 0, pady = (10, 10))
+# top left and top right
+description_TL_frame = Frame(top_description_frame, bg = white , width = 500, height = 50)
+description_TL_frame.grid(row = 0, column = 0, padx = (0, 50))
+description_TL_frame.pack_propagate(0)
+description_TR_frame = Frame(top_description_frame, bg = white , width = 250, height = 50)
+description_TR_frame.grid(row = 0, column = 1)
+description_TR_frame.pack_propagate(0)
 
-search_error_label = Label(top_description_frame, text="placeholder error", background=white, fg='red', font = (font, 13, "bold"))
-search_error_label.grid(row = 0, column = 1, pady = (10, 0), padx = (450, 10))
-title_label = Label(top_description_frame, text="placeholder title", background=white, font = (font, 13, "bold", "underline"), fg = primary)
-title_label.grid(row = 0, column = 0, pady = (10, 0))
-genres_label = Label(top_description_frame, text="placeholder genres", background=white, font = (font, 11), fg = primary)
-genres_label.grid(row = 1, column = 0, pady = (0, 10))
+# elements for top left
+title_label = Label(description_TL_frame, text="placeholder title", background=white, font = (font, 13, "bold", "underline"), fg = primary)
+title_label.pack(anchor='w')
+genres_label = Label(description_TL_frame, text="placeholder genres", background=white, font = (font, 11), fg = primary)
+genres_label.pack(anchor='w')
+# elements for top right
+search_error_label = Label(description_TR_frame, text="placeholder error", background=white, fg='red', font = (font, 13, "bold"))
+search_error_label.pack(anchor='e')
+
+description_TL_frame.grid_columnconfigure(0, weight=1)
 
 description_label = Label(right_MI_frame, text="placeholder description", font = (font, 11), background=white, wraplength = 770, fg = primary, justify = "left", anchor = "w")
 description_label.grid(row = 1, column = 0, pady = (0, 100), sticky = "nw")
