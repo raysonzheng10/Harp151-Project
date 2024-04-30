@@ -36,17 +36,15 @@ def clear_text():
 
 # updates text boxes with reviews
 def update_review_texts(good_reviews, bad_reviews):
+    good_review_text.insert("1.0", "Positive Reviews\n", "bold_centered")
+    bad_review_text.insert("1.0", "Negative Reviews\n", "bold_centered")
     for review in good_reviews:
         text = f"{review} \n\n"
-        good_review_text.insert(END, text)
-        good_review_text.tag_config("tag_name", justify = "center")
-        good_review_text.tag_add("tag_name", "1.0", "end")
+        good_review_text.insert(END, text, 'review_text')
 
     for review in bad_reviews:
         text = f"{review} \n\n"
-        bad_review_text.insert(END, text)
-        bad_review_text.tag_config("tag_name", justify = "center")
-        bad_review_text.tag_add("tag_name", "1.0", "end")
+        bad_review_text.insert(END, text, 'review_text')
 
 def update_rating(rating):
     rating_label.config(text=f'Rating: {rating}')
@@ -88,9 +86,10 @@ def process_platformSelection(platform):
             reviews = CreatedTMDBAPI.get_reviews(title)
             rating = CreatedTMDBAPI.get_average_rating(title)
         case _:
-            good_review_text.insert(END, "Please select a platform using the dropdown menu.")
+            error_label.config(text = "Select a platform!")
             return
-    
+        
+    error_label.config(text = "")
     # update rating value
     update_rating(rating)
 
@@ -118,9 +117,9 @@ def mainProcess(movie_title):
 
     # movie_info is false if we failed, let user know of this as well
     if not movie_info:
-        search_error_label.config(text = "Movie Title is not recognized.")
+        error_label.config(text = "Movie Title is not recognized.")
         return
-    search_error_label.config(text = "") # if it was good, reset the label to be nothing
+    error_label.config(text = "") # if it was good, reset the label to be nothing
 
     # use that information to update the tkinter window
     update_MI_frame(movie_info)
@@ -188,17 +187,16 @@ description_TR_frame.grid(row = 0, column = 1)
 description_TR_frame.pack_propagate(0)
 
 # elements for top left
-title_label = Label(description_TL_frame, text="placeholder title", background=white, font = (font, 13, "bold", "underline"), fg = primary)
+title_label = Label(description_TL_frame, text="", background=white, font = (font, 13, "bold", "underline"), fg = primary)
 title_label.pack(anchor='w')
-genres_label = Label(description_TL_frame, text="placeholder genres", background=white, font = (font, 11), fg = primary)
+genres_label = Label(description_TL_frame, text="", background=white, font = (font, 11), fg = primary)
 genres_label.pack(anchor='w')
 # elements for top right
-search_error_label = Label(description_TR_frame, text="placeholder error", background=white, fg='red', font = (font, 13, "bold"))
-search_error_label.pack(anchor='e')
+error_label = Label(description_TR_frame, text="", background=white, fg='red', font = (font, 13, "bold"))
+error_label.pack(anchor='e')
 
-description_TL_frame.grid_columnconfigure(0, weight=1)
 
-description_label = Label(right_MI_frame, text="placeholder description", font = (font, 11), background=white, wraplength = 770, fg = primary, justify = "left", anchor = "w")
+description_label = Label(right_MI_frame, text="", font = (font, 11), background=white, wraplength = 770, fg = primary, justify = "left", anchor = "w")
 description_label.grid(row = 1, column = 0, pady = (0, 100), sticky = "nw")
 
 
@@ -207,31 +205,48 @@ description_label.grid(row = 1, column = 0, pady = (0, 100), sticky = "nw")
 reviews_frame = Frame(root, bg = white, height = 400)
 reviews_frame.grid(row = 2, column = 0, sticky = "ew", pady=(10, 0))
 
+#  -------------------- top reviews frame --------------------
 top_reviews_frame = Frame(reviews_frame, bg = white)
 top_reviews_frame.grid(row = 0, column = 0, sticky = "ew", padx = (10,0), pady = (0, 10))
 
+# top left and top right
+reviews_TL_frame = Frame(top_reviews_frame, bg = white , width = 460, height = 30)
+reviews_TL_frame.grid(row = 0, column = 0, padx = (0, 48))
+reviews_TL_frame.pack_propagate(0)
+reviews_TR_frame = Frame(top_reviews_frame, bg = white , width = 460, height = 30)
+reviews_TR_frame.grid(row = 0, column = 1)
+reviews_TR_frame.pack_propagate(0)
+
 platform_selector = StringVar()
 platform_selector.set("Select a Platform")
-platform_dropdown = OptionMenu(top_reviews_frame, platform_selector, *platform_selections, command = process_platformSelection)
+platform_dropdown = OptionMenu(reviews_TL_frame, platform_selector, *platform_selections, command = process_platformSelection)
 platform_dropdown.config(bg = primary, fg = white, font = (font, 11))
-platform_dropdown.grid(row = 0, column = 0, sticky = "w")
+platform_dropdown.pack(anchor='w')
 
-rating_label = Label(top_reviews_frame, text = "Rating: placeholder rating", bg = primary, fg = white, font = (font, 11), borderwidth=5)
-rating_label.grid(row = 0, column = 1, padx = (355, 10), sticky = "e")
+rating_label = Label(reviews_TR_frame, text = "Rating: N/A", bg = primary, fg = white, font = (font, 11), borderwidth=5)
+rating_label.pack(anchor='w')
 
+#  -------------------- bottom reviews frame --------------------
 bot_reviews_frame = Frame(reviews_frame, bg = white)
 bot_reviews_frame.grid(row = 1, column = 0, padx = 10)
 
-good_review_text = Text(bot_reviews_frame, width = 56, height = 21, padx = 5, borderwidth = 5)
+
+good_review_text = Text(bot_reviews_frame, width = 56, height = 21, padx = 5, borderwidth=3)
 good_review_text.grid(row = 0, column= 0)
-good_review_text.insert("1.0", "Positive Reviews\n")  
+# configure tags
+good_review_text.tag_configure("bold_centered", font=("Tahoma", 12, "bold"), justify="center")
+good_review_text.tag_configure("review_text", font=("Tahoma", 10))
+
 
 mid_review_frame = Frame(bot_reviews_frame, bg = white)
 mid_review_frame.grid(row = 0, column = 1, padx = 20)
 
-bad_review_text = Text(bot_reviews_frame, width = 56, height = 21, padx = 5, borderwidth = 5)
+bad_review_text = Text(bot_reviews_frame, width = 56, height = 21, padx = 5, borderwidth=3)
 bad_review_text.grid(row = 0, column= 2)
-bad_review_text.insert("1.0", "Negative Reviews\n")
+# configure tags
+bad_review_text.tag_configure("bold_centered", font=("Tahoma", 12, "bold"), justify="center")
+bad_review_text.tag_configure("review_text", font=("Tahoma", 10))
+
 
 
 root.mainloop()
