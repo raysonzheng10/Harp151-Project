@@ -1,7 +1,7 @@
 from Scrapers.TMDB_API import CreatedTMDBAPI
 from Scrapers.youtubeAPI import CreatedYoutubeAPI
-# from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
-# from Scrapers.googleReviews import CreatedGoogleReviews
+from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
+from Scrapers.googleReviews import CreatedGoogleReviews
 from VaderSentiment import *
 from tkinter import *
 from tkint_helper import *
@@ -38,13 +38,20 @@ def clear_text():
 def update_review_texts(good_reviews, bad_reviews):
     good_review_text.insert("1.0", "Positive Reviews\n", "bold_centered")
     bad_review_text.insert("1.0", "Negative Reviews\n", "bold_centered")
-    for review in good_reviews:
-        text = f"{review} \n\n"
-        good_review_text.insert(END, text, 'review_text')
 
-    for review in bad_reviews:
-        text = f"{review} \n\n"
-        bad_review_text.insert(END, text, 'review_text')
+    if len(good_reviews) == 0:
+        good_review_text.insert(END, "No good reviews found :(", 'review_text')
+    else:
+        for review in good_reviews:
+            text = f"{review} \n\n"
+            good_review_text.insert(END, text, 'review_text')
+
+    if len(bad_reviews) == 0:
+        bad_review_text.insert(END, "No bad reviews found :)", 'review_text')
+    else:
+        for review in bad_reviews:
+            text = f"{review} \n\n"
+            bad_review_text.insert(END, text, 'review_text')
 
 def update_rating(rating):
     rating_label.config(text=f'Rating: {rating}')
@@ -59,9 +66,8 @@ def process_platformSelection(platform):
     # this is basically a bunch of if statements, check which platform we are using
     match platform:
         case "Rotten Tomatoes":
-            return
-            # reviews = CreatedRottenTomatoesScraper.get_critic_reviews(title)
-            # rating = CreatedRottenTomatoesScraper.get_review_score(title)
+            reviews = CreatedRottenTomatoesScraper.get_critic_reviews(title)
+            rating = CreatedRottenTomatoesScraper.get_review_score(title)
         case "Youtube": 
             # for youtube, we have to grab the yt trailer id first
             # we grab a list of video ids, scan through videos until we find one with comments
@@ -79,12 +85,11 @@ def process_platformSelection(platform):
                     continue
 
         case "Google Reviews":
-            return
-            # reviews = CreatedGoogleReviews.get_google_reviews(title)
-            # rating = CreatedGoogleReviews.average_score
+            reviews = CreatedGoogleReviews.get_google_reviews(title)
+            rating = CreatedGoogleReviews.average_score
         case "TMDB":
             reviews = CreatedTMDBAPI.get_reviews(title)
-            rating = CreatedTMDBAPI.get_average_rating(title)
+            rating = str(CreatedTMDBAPI.get_average_rating(title)) + " out of 10"
         case _:
             error_label.config(text = "Select a platform!")
             return
