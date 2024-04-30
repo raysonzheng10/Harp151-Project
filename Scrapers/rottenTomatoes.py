@@ -135,7 +135,7 @@ class RottenTomatoesScraper:
                 EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, "Rotten Tomatoes"))
             )
         self.driver.find_element(By.PARTIAL_LINK_TEXT, "Rotten Tomatoes").click()
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 2).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[1]/rt-text'))
         )
         tomatometer = self.driver.find_element(By.XPATH, '//*[@id="modules-wrap"]/div[1]/media-scorecard/rt-button[1]/rt-text').text
