@@ -1,21 +1,25 @@
 from Scrapers.TMDB_API import CreatedTMDBAPI
 from Scrapers.youtubeAPI import CreatedYoutubeAPI
-# from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
-# from Scrapers.googleReviews import CreatedGoogleReviews
+from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
+from Scrapers.googleReviews import CreatedGoogleReviews
 from VaderSentiment import *
 from tkinter import *
 from tkint_helper import *
 
 # function that updates the image in the poster
-def update_poster():
-    tk_poster = get_scaled_image(path = r"images\poster.png", width = 170, height = 250)
+def update_poster(poster_validity: bool) -> None:
+    if poster_validity:
+        tk_poster = get_scaled_image(path = r"images\poster.png", width = 170, height = 250)
+    else:
+        tk_poster = get_scaled_image(path = r"images\no_image_found.png", width = 170, height = 250)
     poster.create_image(85, 125, image = tk_poster)
     poster.image = tk_poster
 
 # function that updates all the movie information
-def update_MI_frame(movie_info):
+def update_MI_frame(movie_info: dict) -> None:
+    poster_validity = movie_info['poster']
     # update image for poster
-    update_poster()
+    update_poster(poster_validity)
 
     # grab information from the dict
     title = movie_info['title']
@@ -122,8 +126,8 @@ def mainProcess(movie_title):
 
     # movie_info is false if we failed, let user know of this as well
     if not movie_info:
-        error_label.config(text = "Movie Title is not recognized.")
-        return
+        error_label.config(text = "Movie title is not recognized.")
+        return False # return false if we failed
     error_label.config(text = "") # if it was good, reset the label to be nothing
 
     # use that information to update the tkinter window
@@ -134,6 +138,9 @@ def mainProcess(movie_title):
     movie_name.set("")
 
     process_platformSelection(platform_selector.get())
+    
+    # return true if successful
+    return True
 
 
 # create Root
@@ -141,11 +148,15 @@ root = Tk()
 root.geometry("1000x750")
 root.title("Movie Review Compiler")
 
+# <--------------------------------------------------------------- MAIN FRAME --------------------------------------------------------------->
+main_frame = Frame(root, bg = white)
+# main_frame.pack()
+# don't pack it, we will reveal the main frame after
+
 # <------------------------------------------------- HEADER FRAME ------------------------------------------------->
 # header frame
-header_frame = Frame(root, bg = primary, height = 10)
+header_frame = Frame(main_frame, bg = primary, height = 10)
 header_frame.grid(row = 0, column = 0, sticky = "ew")
-
 
 header_label = Label(header_frame, text = "Movie Review Compiler", font = (font, 15, "bold"), bg = primary, fg = white)
 header_label.grid(row = 0, column = 0, padx = 12, sticky = "ew")
@@ -165,7 +176,7 @@ get_movie_btn.grid(row = 0, column = 2, padx = 15)
 
 # <------------------------------------------------- MOVIE INFORMATION FRAME ------------------------------------------------->
 # movie info frame
-movie_information_frame = Frame(root, bg = white, height = 70)
+movie_information_frame = Frame(main_frame, bg = white, height = 70)
 movie_information_frame.grid(row = 1, column = 0, sticky = "ew", pady=(10, 0))
 
 # separate into left and right sections
@@ -179,13 +190,11 @@ poster = Canvas(left_MI_frame, width = 170, height = 250, background = white)
 poster.grid(row = 0, column = 0, padx = (10,0), sticky = "nw")
 
 # elements for right MI frame
-
 #  -------------------- top description frame --------------------
 top_description_frame = Frame(right_MI_frame, bg = white, width = 770)
 top_description_frame.pack_propagate(0)
 top_description_frame.grid(row = 0, column = 0, pady = (15, 10))
 
-# top_description_frame.pack()
 # top left and top right 
 # pack_propogate locks the size of the frame so stuff doesn't move around
 description_TL_frame = Frame(top_description_frame, bg = white , width = 500, height = 50)
@@ -204,6 +213,7 @@ genres_label.pack(anchor='w')
 error_label = Label(description_TR_frame, text="", background=white, fg='red', font = (font, 13, "bold"))
 error_label.pack(anchor='e')
 
+#  -------------------- bottom description frame --------------------
 bottom_description_frame = Frame(right_MI_frame, bg = white, width = 770, height = 200)
 bottom_description_frame.pack_propagate(0)
 bottom_description_frame.grid(row = 1, column = 0,  sticky='nw')
@@ -213,7 +223,7 @@ description_label.pack(anchor='w')
 
 # <------------------------------------------------- REVIEWS FRAME ------------------------------------------------->
 # reviews frame
-reviews_frame = Frame(root, bg = white, height = 400)
+reviews_frame = Frame(main_frame, bg = white, height = 400)
 reviews_frame.grid(row = 2, column = 0, sticky = "ew", pady=(10, 0))
 
 #  -------------------- top reviews frame --------------------
@@ -258,6 +268,62 @@ bad_review_text.grid(row = 0, column= 2)
 bad_review_text.tag_configure("bold_centered", font=("Tahoma", 12, "bold"), justify="center")
 bad_review_text.tag_configure("review_text", font=("Tahoma", 10))
 
+# <--------------------------------------------------------------- INITIAL FRAME --------------------------------------------------------------->
+# this sequence forgets the initial search frame and places the main frame up
+def load_main_frame():
+    initial_frame.forget()
+    main_frame.tkraise()
+
+    main_frame.pack()
+
+# this function runs when the user presses search on the intial page
+def first_search(movie_title):
+    # run main process
+    result = mainProcess(movie_title)
+
+    # result is false if mainProcess didn't work
+    if not result:
+        initial_error_label.config(text = "Movie title is not recognized")
+        return
+    
+    # if mainProcess was successful, we load in the main frame
+    load_main_frame()
+
+
+initial_frame = Frame(root, bg = primary, width = 1000, height = 750)
+initial_frame.pack_propagate(0)
+initial_frame.pack()
+
+# make three frames to separate our initial page
+initial_header_frame = Frame(initial_frame, bg = primary, width = 1000, height = 200)
+search_frame = Frame(initial_frame, bg = primary, width = 1000, height = 50)
+author_frame = Frame(initial_frame, bg = primary, width = 1000, height = 50)
+
+# grid them, they're just stacked on top of each other
+initial_header_frame.grid(row = 0, column = 0, pady=(320,10), padx=(320,320))
+search_frame.grid(row = 1, column = 0, pady=(0,10))
+author_frame.grid(row = 2, column = 0, pady=(10, 250))
+
+
+# ---------- initial header frame elements ----------
+initial_header_label = Label(initial_header_frame, text = "Movie Review Compiler", font = (font, 25, "bold"), bg = primary, fg = secondary)
+initial_subheader_label = Label(initial_header_frame, text = "Search for a movie", font = (font, 15, "bold"), bg = primary, fg = white)
+initial_header_label.pack()
+initial_subheader_label.pack()
+
+# ---------- search frame elements ----------
+initial_movie_name_entry = Entry(search_frame, textvariable = movie_name, width = 40, font = (font, 15), bg = white, fg = primary, justify = LEFT, borderwidth = 5, relief = FLAT)
+initial_movie_name_entry.grid(row = 0, column = 0, sticky = "e", pady = 10)
+
+initial_get_movie_btn = Button(search_frame, command = lambda: first_search(movie_name.get()), width = search_icon_size, height=search_icon_size, bg = secondary, image = tk_search_icon)
+initial_get_movie_btn.grid(row = 0, column = 1, padx = (15,0))
+
+# ---------- author frame elements ----------
+author_label = Label(author_frame, text = "Made by Rayson, Trinity, and Jomin", font = (font, 15, "bold"), bg = primary, fg = white)
+author_label.grid(row = 0, column = 0, pady = 10)
+
+initial_error_label = Label(author_frame, text = "", font = (font, 13, "bold"), bg = primary, fg = "Red")
+initial_error_label.grid(row = 1, column = 0)
 
 
 root.mainloop()

@@ -113,6 +113,7 @@ class TMDB_API:
     # this method saves a png of a given image path from the TMDB API
     def save_image(self, image_path: str) -> None:
         url = f'{self.baseImageURL}/{image_path}'
+
         urllib.request.urlretrieve( 
         f'{url}', 
         r"images\poster.png") 
@@ -140,9 +141,15 @@ class TMDB_API:
         info['release_date'] = data['release_date'].split("-")[0]
         info['genres'] = genres
 
+        # if we were able to get a poster, save it as True, else save it as False
+        if data['poster_path'] == None:
+            info['poster'] = False
+        else:
+            # if the poster path is valid, save that poster to our repo
+            info['poster'] = True
+            self.save_image(data['poster_path'])
 
-        # calls a method to save the poster for later use
-        self.save_image(data['poster_path'])
+
         return info
 
     def get_average_rating(self, movie_title: str) -> str:
