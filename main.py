@@ -1,7 +1,7 @@
 from Scrapers.TMDB_API import CreatedTMDBAPI
 from Scrapers.youtubeAPI import CreatedYoutubeAPI
-from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
-from Scrapers.googleReviews import CreatedGoogleReviews
+# from Scrapers.rottenTomatoes import CreatedRottenTomatoesScraper
+# from Scrapers.googleReviews import CreatedGoogleReviews
 from VaderSentiment import *
 from tkinter import *
 from tkint_helper import *
@@ -181,9 +181,13 @@ poster.grid(row = 0, column = 0, padx = (10,0), sticky = "nw")
 # elements for right MI frame
 
 #  -------------------- top description frame --------------------
-top_description_frame = Frame(right_MI_frame, bg = white)
-top_description_frame.grid(row = 0, column = 0, pady = (10, 10))
-# top left and top right
+top_description_frame = Frame(right_MI_frame, bg = white, width = 770)
+top_description_frame.pack_propagate(0)
+top_description_frame.grid(row = 0, column = 0, pady = (15, 10))
+
+# top_description_frame.pack()
+# top left and top right 
+# pack_propogate locks the size of the frame so stuff doesn't move around
 description_TL_frame = Frame(top_description_frame, bg = white , width = 500, height = 50)
 description_TL_frame.grid(row = 0, column = 0, padx = (0, 50))
 description_TL_frame.pack_propagate(0)
@@ -200,10 +204,12 @@ genres_label.pack(anchor='w')
 error_label = Label(description_TR_frame, text="", background=white, fg='red', font = (font, 13, "bold"))
 error_label.pack(anchor='e')
 
+bottom_description_frame = Frame(right_MI_frame, bg = white, width = 770, height = 200)
+bottom_description_frame.pack_propagate(0)
+bottom_description_frame.grid(row = 1, column = 0,  sticky='nw')
 
-description_label = Label(right_MI_frame, text="", font = (font, 11), background=white, wraplength = 770, fg = primary, justify = "left", anchor = "w")
-description_label.grid(row = 1, column = 0, pady = (0, 100), sticky = "nw")
-
+description_label = Label(bottom_description_frame, text="", font = (font, 11), background=white, wraplength = 770, fg = primary, justify = "left", anchor = "w")
+description_label.pack(anchor='w')
 
 # <------------------------------------------------- REVIEWS FRAME ------------------------------------------------->
 # reviews frame
