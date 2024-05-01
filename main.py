@@ -37,6 +37,7 @@ def update_MI_frame(movie_info: dict) -> None:
 def clear_text():
     good_review_text.delete('1.0', 'end')
     bad_review_text.delete('1.0', 'end')
+    error_label.config(text = "")
 
 # updates text boxes with reviews
 def update_review_texts(good_reviews, bad_reviews):
@@ -57,15 +58,14 @@ def update_review_texts(good_reviews, bad_reviews):
             text = f"{review} \n\n"
             bad_review_text.insert(END, text, 'review_text')
 
+# updates rating label
 def update_rating(rating):
     rating_label.config(text=f'Rating: {rating}')
 
-# function that grabs reviews according to the platform on the dropdown menu
-# displays reviews in the text box
-def process_platformSelection(platform):
-    print(f"Grabbing reviews on {platform} for {title}....")
-    # clear all review text
-    clear_text()
+# grab reviews/rating for a specified platform
+def get_reviews_ratings(platform):
+    reviews = []
+    rating = "N/A"
 
     # this is basically a bunch of if statements, check which platform we are using
     match platform:
@@ -95,16 +95,40 @@ def process_platformSelection(platform):
             reviews = CreatedTMDBAPI.get_reviews(title)
             rating = str(CreatedTMDBAPI.get_average_rating(title)) + " out of 10"
         case _:
-            error_label.config(text = "Select a platform!")
-            return
-        
-    error_label.config(text = "")
+            error_label.config(text = "Invalid platform!")
+
+    # more protection against nonetype errors
+    if reviews == None:
+        reviews = []
+    if rating == None:
+        rating = "N/A"
+    
+    return reviews, rating
+
+# function that grabs reviews according to the platform on the dropdown menu
+# displays reviews in the text box
+def process_platformSelection(platform):
+    # if the user hasn't selected a platform, give error message
+    if platform == "Select a Platform":
+        error_label.config(text = "Select a platform!")
+        return
+    
+    # else, start grabbing reviews
+    print(f"Grabbing reviews on {platform} for {title}....")
+    # clear all review text
+    clear_text()
+
+    res = get_reviews_ratings(platform)
+    reviews = res[0]
+    rating = res[1]
+    
     # update rating value
     update_rating(rating)
 
     # if reviews is empty, we weren't able to successfully grab any, so we exit and show error
     if len(reviews) == 0:
-        good_review_text.insert(END, f"No reviews found on {platform}.")
+        error_label.config(text = f"No reviews found on {platform}.")
+        print("Length of reviews is 0, aborting...")
         return
     
     # use vader sentiment to sort reviews into good/bad
@@ -198,9 +222,9 @@ top_description_frame.grid(row = 0, column = 0, pady = (15, 10))
 # top left and top right 
 # pack_propogate locks the size of the frame so stuff doesn't move around
 description_TL_frame = Frame(top_description_frame, bg = white , width = 500, height = 50)
-description_TL_frame.grid(row = 0, column = 0, padx = (0, 50))
+description_TL_frame.grid(row = 0, column = 0, padx = (0, 5))
 description_TL_frame.pack_propagate(0)
-description_TR_frame = Frame(top_description_frame, bg = white , width = 250, height = 50)
+description_TR_frame = Frame(top_description_frame, bg = white , width = 300, height = 50)
 description_TR_frame.grid(row = 0, column = 1)
 description_TR_frame.pack_propagate(0)
 
@@ -210,7 +234,7 @@ title_label.pack(anchor='w')
 genres_label = Label(description_TL_frame, text="", background=white, font = (font, 11), fg = primary)
 genres_label.pack(anchor='w')
 # elements for top right
-error_label = Label(description_TR_frame, text="", background=white, fg='red', font = (font, 13, "bold"))
+error_label = Label(description_TR_frame, text="", background=white, fg='red', font = (font, 12, "bold"))
 error_label.pack(anchor='e')
 
 #  -------------------- bottom description frame --------------------
