@@ -26,13 +26,17 @@ def separate_good_bad(reviews):
     for review in reviews:
         # grab the general_sentiment of the review
         result = analyzer.polarity_scores(review)
-        general_sentiment = result["compound"]
+        general_sentiment = result['compound']
 
         # sort reviews based on negative/positive
-        if general_sentiment < -0.25:
-            bad_reviews.append(review)
-        else:
+        if general_sentiment > 0.2:
             good_reviews.append(review)
+        elif general_sentiment < -0.2:
+            bad_reviews.append(review)
+        elif result['pos'] > result['neg']:
+            good_reviews.append(review)
+        else:
+            bad_reviews.append(review)
 
     # return as a tuple
     return good_reviews, bad_reviews
