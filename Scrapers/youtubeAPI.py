@@ -66,7 +66,8 @@ class YouTubeAPI:
 
 
 # Youtube APIKey was created from the YT app
-YOUTUBE_APIKEY = 'AIzaSyBEzevk5Am8U4xhlgdTmMmuFRB7FtbIDQw'
+
+YOUTUBE_APIKEY = '' # ! <- ADD YOUR OWN YOUTUBE APIKEY HERE 
 video_id = 'yFrxzaBLDQM' 
 
 # create an instance of the YouTubeAPI Class
