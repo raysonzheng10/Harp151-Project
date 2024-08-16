@@ -6,7 +6,7 @@ For our HARP 151 Final Project at Binghamton University, we decided to make a pr
 
 For Rotten Tomatoes and Google Reviews, we used Selenium to manually scrape their reviews. For TMDB and Youtube, we used their respective APIs to get their reviews.
 
-To run the program, simply run main.py
+To run the program, you first have to set the API keys for Youtube and TMDB. These files can be found in the _scrapers_ folder. After that, simply run main.py.
 
 ## More Details
 The repository is broken down into a few parts.
