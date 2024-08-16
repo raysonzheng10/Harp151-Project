@@ -168,5 +168,5 @@ class TMDB_API:
         return rating
 
 
-TMDB_APIKEY = 'ccf9c9b2f8cdb6869ab8953b3eff620f'
+TMDB_APIKEY = '' # ! <- ADD YOUR OWN API KEY HERE!
 CreatedTMDBAPI = TMDB_API(TMDB_APIKEY)
